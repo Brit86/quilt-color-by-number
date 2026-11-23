@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5, user-scalable=yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="theme-color" content="#F7EFE2" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D'%68ttp%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2064%2064'%3E%3Crect%20width%3D'64'%20height%3D'64'%20fill%3D'%23F3E6C8'%2F%3E%3Crect%20x%3D'4'%20y%3D'4'%20width%3D'28'%20height%3D'28'%20fill%3D'%23C97B7B'%2F%3E%3Crect%20x%3D'32'%20y%3D'4'%20width%3D'28'%20height%3D'28'%20fill%3D'%239CAF88'%2F%3E%3Crect%20x%3D'4'%20y%3D'32'%20width%3D'28'%20height%3D'28'%20fill%3D'%23E9C46A'%2F%3E%3Crect%20x%3D'32'%20y%3D'32'%20width%3D'28'%20height%3D'28'%20fill%3D'%235B7FA6'%2F%3E%3C%2Fsvg%3E" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'%68ttp%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2064%2064'%3E%3Crect%20width%3D'64'%20height%3D'64'%20fill%3D'%23F3E6C8'%2F%3E%3Crect%20x%3D'4'%20y%3D'4'%20width%3D'28'%20height%3D'28'%20fill%3D'%23C97B7B'%2F%3E%3Crect%20x%3D'32'%20y%3D'4'%20width%3D'28'%20height%3D'28'%20fill%3D'%239CAF88'%2F%3E%3Crect%20x%3D'4'%20y%3D'32'%20width%3D'28'%20height%3D'28'%20fill%3D'%23E9C46A'%2F%3E%3Crect%20x%3D'32'%20y%3D'32'%20width%3D'28'%20height%3D'28'%20fill%3D'%235B7FA6'%2F%3E%3C%2Fsvg%3E" />
+    <meta name="apple-mobile-web-app-title" content="Quilt Color by Number" />
+    <title>Quilt Color by Number</title>
+    <style>
+      :root{
+        --bg:#F7EFE2;
+        --bg2:#F3E6C8;
+        --ink:#4A3F35;
+        --ink-soft:#7A6A58;
+        --card:#FFFDF8;
+        --card-edge:#E3D5B8;
+        --rose:#C97B7B;
+        --rose-dark:#A85D5D;
+        --sage:#9CAF88;
+        --denim:#5B7FA6;
+        --butter:#E9C46A;
+        --plum:#7D5A7A;
+        --terra:#C67B5C;
+        --teal:#5E9B8A;
+        --cream:#F3E6C8;
+        --shadow:0 4px 0 rgba(74,63,53,.12);
+        --radius:20px;
+      }
+      *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+      html,body{ margin:0; padding:0; }
+      body{
+        font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+        background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+        background-attachment:fixed;
+        color:var(--ink);
+        min-height:100vh;
+        touch-action:manipulation;
+      }
+      button{ font-family:inherit; cursor:pointer; color:inherit; }
+      button:focus-visible{ outline:4px solid var(--terra); outline-offset:2px; }
+
+      .topbar{
+        position:sticky; top:0; z-index:30;
+        display:flex; align-items:center; gap:10px;
+        padding:10px 14px;
+        background:rgba(247,239,226,.88);
+        backdrop-filter:blur(6px);
+        border-bottom:2px solid var(--card-edge);
+      }
+      .top-title{
+        font-family:Georgia,"Times New Roman",serif;
+        font-size:1.25rem; font-weight:700; letter-spacing:.3px;
+      }
+      .topbar .spacer{ flex:1; }
+      .icon-btn{
+        display:flex; align-items:center; gap:8px;
+        background:var(--card); border:3px solid var(--card-edge);
+        border-radius:999px; padding:8px 16px; min-height:48px;
+        font-size:1.05rem; font-weight:800;
+      }
+      .icon-btn:active{ transform:translateY(2px); }
+
+      main{ max-width:760px; margin:0 auto; padding:6px 16px 48px; }
+      .screen{ display:none; }
+      .screen.on{ display:block; animation:fadeIn .25s ease; }
+      @keyframes fadeIn{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:none;} }
+      .noscript-box{ max-width:560px; margin:24px auto; background:#FFF3C9; border:3px solid var(--terra); border-radius:16px; padding:18px 20px; font-size:1.1rem; line-height:1.5; text-align:center; }
+
+      h1.greet{
+        font-family:Georgia,"Times New Roman",serif;
+        font-size:2.1rem; margin:12px 0 2px; text-align:center; letter-spacing:.3px;
+      }
+      .sub{ text-align:center; font-size:1.15rem; margin:0 0 14px; color:var(--ink-soft); font-weight:600; }
+      .patch-strip{
+        height:14px; border-radius:999px; margin:6px auto 18px; max-width:420px;
+        background:repeating-linear-gradient(90deg, #C97B7B 0 28px, #9CAF88 28px 56px, #E9C46A 56px 84px, #5B7FA6 84px 112px, #7D5A7A 112px 140px);
+        border:2px solid var(--card-edge);
+      }
+
+      /* ---------- gallery ---------- */
+      .gallery{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+      @media (min-width:560px){ .gallery{ grid-template-columns:1fr 1fr 1fr; } }
+      .quilt-card{
+        background:var(--card); border:3px solid var(--card-edge);
+        border-radius:var(--radius); padding:12px 10px 12px;
+        display:flex; flex-direction:column; align-items:center; gap:6px;
+        box-shadow:var(--shadow); text-align:center; min-height:190px;
+      }
+      .quilt-card:active{ transform:translateY(3px); }
+      .quilt-card.done{ border-color:var(--sage); background:#F6FAF2; }
+      .thumb{ display:block; width:118px; height:118px; }
+      .thumb svg{ width:100%; height:100%; display:block; border-radius:10px; }
+      .qname{ font-family:Georgia,"Times New Roman",serif; font-size:1.2rem; font-weight:700; line-height:1.15; }
+      .qprog{ font-size:.95rem; font-weight:700; color:var(--ink-soft); }
+      .qprog.done{ color:#5B7A45; }
+      .reset-btn{
+        display:block; margin:26px auto 0;
+        background:none; border:none; color:var(--ink-soft);
+        font-size:1rem; font-weight:700; text-decoration:underline;
+        padding:12px 16px; min-height:48px;
+      }
+      .fineprint{ text-align:center; color:var(--ink-soft); font-size:.95rem; margin:8px 0 0; }
+
+      /* ---------- quilt screen ---------- */
+      .quilt-head{ text-align:center; }
+      .quilt-head h2{
+        font-family:Georgia,"Times New Roman",serif;
+        font-size:1.7rem; margin:10px 0 2px;
+      }
+      .progress-line{ font-size:1.1rem; font-weight:700; margin:2px 0 8px; }
+      .progressbar{
+        height:14px; border-radius:999px; background:#EDE3CC;
+        border:2px solid var(--card-edge); overflow:hidden; margin:0 auto 12px; max-width:420px;
+      }
+      #progressFill{ height:100%; width:0%; background:repeating-linear-gradient(90deg, #C97B7B 0 18px, #9CAF88 18px 36px, #E9C46A 36px 54px, #5B7FA6 54px 72px); transition:width .3s ease; }
+      .btn{
+        background:var(--card); border:3px solid var(--card-edge);
+        border-radius:999px; padding:8px 18px; min-height:48px;
+        font-size:1.05rem; font-weight:800;
+      }
+      .btn:active{ transform:translateY(2px); }
+      .btn.primary{ background:var(--rose); border-color:var(--rose-dark); color:#FFFDF8; }
+      .back-row{ text-align:left; margin-top:6px; }
+      .quilt-wrap{
+        background:var(--card); border:3px solid var(--card-edge);
+        border-radius:var(--radius); box-shadow:var(--shadow);
+        padding:10px; overflow:auto; max-height:62vh;
+        -webkit-overflow-scrolling:touch;
+      }
+      .quilt-zoom{ margin:0 auto; width:300px; }
+      .quilt-svg{ display:block; width:100%; height:auto; }
+      .region{ cursor:pointer; }
+      .region.filled{ cursor:default; }
+      .region-num{ pointer-events:none; font-weight:800; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+      @keyframes shakeX{ 0%,100%{ transform:translateX(0);} 20%{ transform:translateX(-5px);} 40%{ transform:translateX(5px);} 60%{ transform:translateX(-4px);} 80%{ transform:translateX(4px);} }
+      .region.shake{ animation:shakeX .4s ease; }
+      @keyframes hintPulse{ 0%,100%{ opacity:1;} 50%{ opacity:.35;} }
+      .region.hint{ animation:hintPulse .7s ease-in-out infinite; stroke:#B5654A; stroke-width:4; }
+
+      .zoom-row{
+        display:flex; align-items:center; justify-content:center; gap:10px;
+        margin:14px 0 6px; flex-wrap:wrap;
+      }
+      .zoom-btn{ min-width:56px; font-size:1.5rem; padding:4px 12px; }
+      #zoomLabel{ font-weight:800; min-width:64px; text-align:center; font-size:1.1rem; }
+
+      .palette{
+        display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+        margin:12px 0 4px;
+      }
+      .swatch{
+        background:var(--card); border:3px solid var(--card-edge);
+        border-radius:16px; padding:8px 6px 7px; min-width:76px; min-height:86px;
+        display:flex; flex-direction:column; align-items:center; gap:3px;
+        box-shadow:var(--shadow);
+      }
+      .swatch.sel{ border-color:var(--ink); transform:translateY(-3px); box-shadow:0 7px 0 rgba(74,63,53,.18); }
+      .swatch:active{ transform:translateY(2px); }
+      .sw{
+        width:46px; height:46px; border-radius:12px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:1.5rem; font-weight:900; color:#FFFDF8;
+        text-shadow:0 1px 2px rgba(0,0,0,.35);
+        border:2px solid rgba(74,63,53,.25);
+      }
+      .sw.light{ color:#4A3F35; text-shadow:none; }
+      .sw-name{ font-size:.85rem; font-weight:700; line-height:1.1; text-align:center; }
+      .sw-left{ font-size:.8rem; font-weight:700; color:var(--ink-soft); }
+      .tip{ text-align:center; color:var(--ink-soft); font-size:1rem; margin:8px 0 0; font-weight:600; }
+
+      .view-bar{
+        display:none; text-align:center; margin:12px 0 4px;
+      }
+      .view-bar.on{ display:block; }
+      .done-banner{
+        display:inline-block; background:#EAF3DF; border:3px solid var(--sage);
+        color:#4E6B3A; border-radius:999px; padding:8px 18px;
+        font-size:1.1rem; font-weight:800; margin-bottom:10px;
+      }
+      .view-bar .btn{ margin:4px; }
+
+      /* ---------- completion overlay ---------- */
+      .overlay{
+        position:fixed; inset:0; z-index:50; display:none;
+        align-items:center; justify-content:center; padding:20px;
+        background:rgba(74,63,53,.45);
+      }
+      .overlay.on{ display:flex; }
+      .party-card{
+        background:var(--card); border:4px solid var(--card-edge);
+        border-radius:26px; padding:26px 22px; text-align:center;
+        max-width:420px; width:100%; box-shadow:0 10px 0 rgba(74,63,53,.25);
+        animation:pop .3s ease;
+      }
+      @keyframes pop{ from{ transform:scale(.85); opacity:0;} to{ transform:scale(1); opacity:1;} }
+      .party-card h2{ font-family:Georgia,"Times New Roman",serif; font-size:1.9rem; margin:0 0 6px; }
+      .party-card p{ font-size:1.15rem; margin:0 0 18px; }
+      .party-card .btn{ margin:4px; }
+      #confetti{ position:fixed; inset:0; z-index:60; pointer-events:none; overflow:hidden; }
+      .confetti-bit{ position:absolute; top:-20px; animation:fall linear forwards; }
+      @keyframes fall{ to{ transform:translateY(110vh) rotate(720deg); } }
+      @media (prefers-reduced-motion: reduce){
+        .confetti-bit{ display:none; }
+        .region.shake,.region.hint{ animation:none; }
+      }
+      #selftest{ white-space:pre-wrap; font-family:monospace; font-size:.8rem; padding:10px; }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <span class="top-title">Quilt Color by Number</span>
+      <span class="spacer"></span>
+      <button class="icon-btn" id="homeBtn" type="button">Gallery</button>
+    </div>
+    <main>
+      <section class="screen on" id="scr-home">
+        <h1 class="greet">Quilt Color by Number</h1>
+        <p class="sub">Pick a quilt, then tap the numbered patches to fill them in.</p>
+        <div class="patch-strip" aria-hidden="true"></div>
+        <div class="gallery" id="gallery"></div>
+        <button class="reset-btn" id="resetBtn" type="button">Clear saved progress</button>
+        <p class="fineprint">Your progress is saved on this device. No accounts, no ads, no timers.</p>
+      </section>
+
+      <section class="screen" id="scr-quilt">
+        <div class="back-row">
+          <button class="btn" id="backBtn" type="button">&larr; Back to gallery</button>
+        </div>
+        <div class="quilt-head">
+          <h2 id="quiltName"></h2>
+          <p class="progress-line" id="progressLine"></p>
+          <div class="progressbar"><div id="progressFill"></div></div>
+        </div>
+        <div class="quilt-wrap" id="quiltWrap">
+          <div class="quilt-zoom" id="quiltZoom"></div>
+        </div>
+        <div class="zoom-row">
+          <button class="btn zoom-btn" id="zoomOut" type="button" aria-label="Zoom out">&minus;</button>
+          <span id="zoomLabel">100%</span>
+          <button class="btn zoom-btn" id="zoomIn" type="button" aria-label="Zoom in">+</button>
+          <button class="btn" id="zoomFit" type="button">Fit</button>
+          <button class="btn" id="hintBtn" type="button">Hint</button>
+        </div>
+        <div class="palette" id="palette"></div>
+        <div class="view-bar" id="viewBar">
+          <span class="done-banner">&#10003; Finished</span><br />
+          <button class="btn" id="recolorBtn" type="button">Re-color this quilt</button>
+          <button class="btn" id="viewGalleryBtn" type="button">Back to gallery</button>
+        </div>
+        <p class="tip" id="tipLine">Tap a color, then tap the patches with that number. Tap a patch to pick its color.</p>
+      </section>
+    </main>
+
+    <div class="overlay" id="overlay">
+      <div class="party-card">
+        <h2 id="doneTitle">Quilt finished!</h2>
+        <p id="doneText"></p>
+        <button class="btn primary" id="nextBtn" type="button">Next quilt</button>
+        <button class="btn" id="doneGalleryBtn" type="button">Gallery</button>
+      </div>
+    </div>
+    <div id="confetti"></div>
+    <div id="selftest" style="display:none"></div>
+    <noscript><div class="noscript-box">This game needs JavaScript turned on to play.</div></noscript>
+
+    <script>
+    "use strict";
+    /* ================= helpers ================= */
+    function $(s){ return document.querySelector(s); }
+    function $$(s){ return Array.prototype.slice.call(document.querySelectorAll(s)); }
+    function el(tag, cls, html){ var e = document.createElement(tag); if(cls) e.className = cls; if(html != null) e.innerHTML = html; return e; }
+    function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+    /* ================= pattern data (generated at build time) ================= */
+    var PATTERNS = [{"id":"nine-patch","name":"Nine Patch","blurb":"A classic first quilt.","palette":[{"n":1,"name":"Dusty Rose","hex":"#C97B7B"},{"n":2,"name":"Sage","hex":"#9CAF88"},{"n":3,"name":"Cream","hex":"#F3E6C8"}],"regions":[{"n":1,"pts":[[0,0],[100,0],[100,100],[0,100]]},{"n":2,"pts":[[100,0],[200,0],[200,100],[100,100]]},{"n":1,"pts":[[200,0],[300,0],[300,100],[200,100]]},{"n":2,"pts":[[0,100],[100,100],[100,200],[0,200]]},{"n":3,"pts":[[100,100],[200,100],[200,200],[100,200]]},{"n":2,"pts":[[200,100],[300,100],[300,200],[200,200]]},{"n":1,"pts":[[0,200],[100,200],[100,300],[0,300]]},{"n":2,"pts":[[100,200],[200,200],[200,300],[100,300]]},{"n":1,"pts":[[200,200],[300,200],[300,300],[200,300]]}]},{"id":"log-cabin","name":"Log Cabin","blurb":"Logs around a warm hearth.","palette":[{"n":1,"name":"Cranberry","hex":"#A85D5D"},{"n":2,"name":"Butter Yellow","hex":"#E9C46A"},{"n":3,"name":"Denim Blue","hex":"#5B7FA6"},{"n":4,"name":"Cream","hex":"#F3E6C8"}],"regions":[{"n":1,"pts":[[120,120],[180,120],[180,180],[120,180]]},{"n":2,"pts":[[120,90],[180,90],[180,120],[120,120]]},{"n":2,"pts":[[180,90],[210,90],[210,180],[180,180]]},{"n":3,"pts":[[120,180],[210,180],[210,210],[120,210]]},{"n":3,"pts":[[90,90],[120,90],[120,210],[90,210]]},{"n":2,"pts":[[90,60],[210,60],[210,90],[90,90]]},{"n":2,"pts":[[210,60],[240,60],[240,210],[210,210]]},{"n":3,"pts":[[90,210],[240,210],[240,240],[90,240]]},{"n":3,"pts":[[60,60],[90,60],[90,240],[60,240]]},{"n":2,"pts":[[60,30],[240,30],[240,60],[60,60]]},{"n":2,"pts":[[240,30],[270,30],[270,240],[240,240]]},{"n":3,"pts":[[60,240],[270,240],[270,270],[60,270]]},{"n":3,"pts":[[30,30],[60,30],[60,270],[30,270]]},{"n":4,"pts":[[0,0],[300,0],[300,30],[0,30]]},{"n":4,"pts":[[270,30],[300,30],[300,270],[270,270]]},{"n":4,"pts":[[0,270],[300,270],[300,300],[0,300]]},{"n":4,"pts":[[0,30],[30,30],[30,270],[0,270]]}]},{"id":"ohio-star","name":"Ohio Star","blurb":"A star that points every way.","palette":[{"n":1,"name":"Dusty Rose","hex":"#C97B7B"},{"n":2,"name":"Denim Blue","hex":"#5B7FA6"},{"n":3,"name":"Cream","hex":"#F3E6C8"}],"regions":[{"n":1,"pts":[[100,100],[200,100],[200,200],[100,200]]},{"n":2,"pts":[[0,0],[100,0],[100,100],[0,100]]},{"n":2,"pts":[[200,0],[300,0],[300,100],[200,100]]},{"n":2,"pts":[[0,200],[100,200],[100,300],[0,300]]},{"n":2,"pts":[[200,200],[300,200],[300,300],[200,300]]},{"n":1,"pts":[[100,0],[200,0],[150,100]]},{"n":3,"pts":[[100,0],[150,100],[100,100]]},{"n":3,"pts":[[200,0],[200,100],[150,100]]},{"n":1,"pts":[[300,100],[300,200],[200,150]]},{"n":3,"pts":[[300,100],[200,150],[200,100]]},{"n":3,"pts":[[300,200],[200,200],[200,150]]},{"n":1,"pts":[[100,300],[200,300],[150,200]]},{"n":3,"pts":[[100,300],[100,200],[150,200]]},{"n":3,"pts":[[200,300],[200,200],[150,200]]},{"n":1,"pts":[[0,100],[0,200],[100,150]]},{"n":3,"pts":[[0,100],[100,150],[100,100]]},{"n":3,"pts":[[0,200],[100,200],[100,150]]}]},{"id":"pinwheel","name":"Pinwheel","blurb":"Spinning in the breeze.","palette":[{"n":1,"name":"Terracotta","hex":"#C67B5C"},{"n":2,"name":"Teal","hex":"#5E9B8A"},{"n":3,"name":"Cream","hex":"#F3E6C8"}],"regions":[{"n":1,"pts":[[0,0],[150,0],[0,150]]},{"n":3,"pts":[[150,150],[150,0],[0,150]]},{"n":2,"pts":[[300,0],[300,150],[150,0]]},{"n":3,"pts":[[150,150],[300,150],[150,0]]},{"n":1,"pts":[[300,300],[150,300],[300,150]]},{"n":3,"pts":[[150,150],[150,300],[300,150]]},{"n":2,"pts":[[0,300],[0,150],[150,300]]},{"n":3,"pts":[[150,150],[0,150],[150,300]]}]},{"id":"flying-geese","name":"Flying Geese","blurb":"Geese heading home.","palette":[{"n":1,"name":"Dusty Rose","hex":"#C97B7B"},{"n":2,"name":"Sage","hex":"#9CAF88"},{"n":3,"name":"Denim Blue","hex":"#5B7FA6"},{"n":4,"name":"Cream","hex":"#F3E6C8"}],"regions":[{"n":1,"pts":[[0,100],[100,100],[50,0]]},{"n":4,"pts":[[0,0],[50,0],[0,100]]},{"n":4,"pts":[[100,0],[100,100],[50,0]]},{"n":1,"pts":[[100,100],[200,100],[150,0]]},{"n":4,"pts":[[100,0],[150,0],[100,100]]},{"n":4,"pts":[[200,0],[200,100],[150,0]]},{"n":1,"pts":[[200,100],[300,100],[250,0]]},{"n":4,"pts":[[200,0],[250,0],[200,100]]},{"n":4,"pts":[[300,0],[300,100],[250,0]]},{"n":2,"pts":[[0,200],[100,200],[50,100]]},{"n":4,"pts":[[0,100],[50,100],[0,200]]},{"n":4,"pts":[[100,100],[100,200],[50,100]]},{"n":2,"pts":[[100,200],[200,200],[150,100]]},{"n":4,"pts":[[100,100],[150,100],[100,200]]},{"n":4,"pts":[[200,100],[200,200],[150,100]]},{"n":2,"pts":[[200,200],[300,200],[250,100]]},{"n":4,"pts":[[200,100],[250,100],[200,200]]},{"n":4,"pts":[[300,100],[300,200],[250,100]]},{"n":3,"pts":[[0,300],[100,300],[50,200]]},{"n":4,"pts":[[0,200],[50,200],[0,300]]},{"n":4,"pts":[[100,200],[100,300],[50,200]]},{"n":3,"pts":[[100,300],[200,300],[150,200]]},{"n":4,"pts":[[100,200],[150,200],[100,300]]},{"n":4,"pts":[[200,200],[200,300],[150,200]]},{"n":3,"pts":[[200,300],[300,300],[250,200]]},{"n":4,"pts":[[200,200],[250,200],[200,300]]},{"n":4,"pts":[[300,200],[300,300],[250,200]]}]},{"id":"churn-dash","name":"Churn Dash","blurb":"An old favorite, full of motion.","palette":[{"n":1,"name":"Dusty Rose","hex":"#C97B7B"},{"n":2,"name":"Denim Blue","hex":"#5B7FA6"},{"n":3,"name":"Cream","hex":"#F3E6C8"},{"n":4,"name":"Sage","hex":"#9CAF88"}],"regions":[{"n":1,"pts":[[100,100],[200,100],[200,200],[100,200]]},{"n":2,"pts":[[0,0],[100,0],[0,100]]},{"n":3,"pts":[[100,100],[100,0],[0,100]]},{"n":2,"pts":[[300,0],[200,0],[300,100]]},{"n":3,"pts":[[200,100],[200,0],[300,100]]},{"n":2,"pts":[[0,300],[0,200],[100,300]]},{"n":3,"pts":[[100,200],[0,200],[100,300]]},{"n":2,"pts":[[300,300],[300,200],[200,300]]},{"n":3,"pts":[[200,200],[300,200],[200,300]]},{"n":4,"pts":[[100,0],[200,0],[200,100]]},{"n":3,"pts":[[100,100],[100,0],[200,100]]},{"n":4,"pts":[[300,100],[300,200],[200,200]]},{"n":3,"pts":[[200,100],[300,100],[200,200]]},{"n":4,"pts":[[200,300],[100,300],[100,200]]},{"n":3,"pts":[[200,200],[200,300],[100,200]]},{"n":4,"pts":[[0,200],[0,100],[100,100]]},{"n":3,"pts":[[100,200],[0,200],[100,100]]}]},{"id":"bears-paw","name":"Bear's Paw","blurb":"Four paws, one cozy quilt.","palette":[{"n":1,"name":"Plum","hex":"#7D5A7A"},{"n":2,"name":"Dusty Rose","hex":"#C97B7B"},{"n":3,"name":"Cream","hex":"#F3E6C8"}],"regions":[{"n":1,"pts":[[0,0],[75,0],[75,75],[0,75]]},{"n":2,"pts":[[75,0],[150,0],[150,75]]},{"n":3,"pts":[[75,75],[75,0],[150,75]]},{"n":2,"pts":[[0,150],[0,75],[75,75]]},{"n":3,"pts":[[75,150],[0,150],[75,75]]},{"n":3,"pts":[[75,75],[150,75],[150,150],[75,150]]},{"n":1,"pts":[[225,0],[300,0],[300,75],[225,75]]},{"n":2,"pts":[[225,0],[150,0],[150,75]]},{"n":3,"pts":[[225,75],[225,0],[150,75]]},{"n":2,"pts":[[300,75],[300,150],[225,150]]},{"n":3,"pts":[[225,75],[300,75],[225,150]]},{"n":3,"pts":[[150,75],[225,75],[225,150],[150,150]]},{"n":1,"pts":[[0,225],[75,225],[75,300],[0,300]]},{"n":2,"pts":[[75,300],[150,300],[150,225]]},{"n":3,"pts":[[75,225],[75,300],[150,225]]},{"n":2,"pts":[[0,225],[0,150],[75,150]]},{"n":3,"pts":[[75,225],[0,225],[75,150]]},{"n":3,"pts":[[75,150],[150,150],[150,225],[75,225]]},{"n":1,"pts":[[225,225],[300,225],[300,300],[225,300]]},{"n":2,"pts":[[150,225],[150,300],[225,300]]},{"n":3,"pts":[[225,225],[150,225],[225,300]]},{"n":2,"pts":[[300,150],[300,225],[225,225]]},{"n":3,"pts":[[225,150],[300,150],[225,225]]},{"n":3,"pts":[[150,150],[225,150],[225,225],[150,225]]}]},{"id":"sawtooth-star","name":"Sawtooth Star","blurb":"Sharp points, soft colors.","palette":[{"n":1,"name":"Butter Yellow","hex":"#E9C46A"},{"n":2,"name":"Terracotta","hex":"#C67B5C"},{"n":3,"name":"Cream","hex":"#F3E6C8"}],"regions":[{"n":1,"pts":[[100,100],[200,100],[200,200],[100,200]]},{"n":2,"pts":[[0,0],[100,0],[50,50]]},{"n":3,"pts":[[100,0],[100,100],[50,50]]},{"n":2,"pts":[[100,100],[0,100],[50,50]]},{"n":3,"pts":[[0,100],[0,0],[50,50]]},{"n":2,"pts":[[200,0],[300,0],[250,50]]},{"n":3,"pts":[[300,0],[300,100],[250,50]]},{"n":2,"pts":[[300,100],[200,100],[250,50]]},{"n":3,"pts":[[200,100],[200,0],[250,50]]},{"n":2,"pts":[[0,200],[100,200],[50,250]]},{"n":3,"pts":[[100,200],[100,300],[50,250]]},{"n":2,"pts":[[100,300],[0,300],[50,250]]},{"n":3,"pts":[[0,300],[0,200],[50,250]]},{"n":2,"pts":[[200,200],[300,200],[250,250]]},{"n":3,"pts":[[300,200],[300,300],[250,250]]},{"n":2,"pts":[[300,300],[200,300],[250,250]]},{"n":3,"pts":[[200,300],[200,200],[250,250]]},{"n":1,"pts":[[100,0],[200,0],[150,100]]},{"n":3,"pts":[[100,0],[150,100],[100,100]]},{"n":3,"pts":[[200,0],[200,100],[150,100]]},{"n":1,"pts":[[300,100],[300,200],[200,150]]},{"n":3,"pts":[[300,100],[200,150],[200,100]]},{"n":3,"pts":[[300,200],[200,200],[200,150]]},{"n":1,"pts":[[100,300],[200,300],[150,200]]},{"n":3,"pts":[[100,300],[100,200],[150,200]]},{"n":3,"pts":[[200,300],[200,200],[150,200]]},{"n":1,"pts":[[0,100],[0,200],[100,150]]},{"n":3,"pts":[[0,100],[100,150],[100,100]]},{"n":3,"pts":[[0,200],[100,200],[100,150]]}]},{"id":"dresden-plate","name":"Dresden Plate","blurb":"A flower made of fabric.","palette":[{"n":1,"name":"Dusty Rose","hex":"#C97B7B"},{"n":2,"name":"Sage","hex":"#9CAF88"},{"n":3,"name":"Butter Yellow","hex":"#E9C46A"}],"regions":[{"n":1,"pts":[[192,150],[290,150],[279.3,203.6],[188.8,166.1]]},{"n":2,"pts":[[188.8,166.1],[279.3,203.6],[249,249],[179.7,179.7]]},{"n":1,"pts":[[179.7,179.7],[249,249],[203.6,279.3],[166.1,188.8]]},{"n":2,"pts":[[166.1,188.8],[203.6,279.3],[150,290],[150,192]]},{"n":1,"pts":[[150,192],[150,290],[96.4,279.3],[133.9,188.8]]},{"n":2,"pts":[[133.9,188.8],[96.4,279.3],[51,249],[120.3,179.7]]},{"n":1,"pts":[[120.3,179.7],[51,249],[20.7,203.6],[111.2,166.1]]},{"n":2,"pts":[[111.2,166.1],[20.7,203.6],[10,150],[108,150]]},{"n":1,"pts":[[108,150],[10,150],[20.7,96.4],[111.2,133.9]]},{"n":2,"pts":[[111.2,133.9],[20.7,96.4],[51,51],[120.3,120.3]]},{"n":1,"pts":[[120.3,120.3],[51,51],[96.4,20.7],[133.9,111.2]]},{"n":2,"pts":[[133.9,111.2],[96.4,20.7],[150,10],[150,108]]},{"n":1,"pts":[[150,108],[150,10],[203.6,20.7],[166.1,111.2]]},{"n":2,"pts":[[166.1,111.2],[203.6,20.7],[249,51],[179.7,120.3]]},{"n":1,"pts":[[179.7,120.3],[249,51],[279.3,96.4],[188.8,133.9]]},{"n":2,"pts":[[188.8,133.9],[279.3,96.4],[290,150],[192,150]]},{"n":3,"pts":[[196,150],[194.4,161.9],[189.8,173],[182.5,182.5],[173,189.8],[161.9,194.4],[150,196],[138.1,194.4],[127,189.8],[117.5,182.5],[110.2,173],[105.6,161.9],[104,150],[105.6,138.1],[110.2,127],[117.5,117.5],[127,110.2],[138.1,105.6],[150,104],[161.9,105.6],[173,110.2],[182.5,117.5],[189.8,127],[194.4,138.1]]}]}];
+
+    function patternById(id){
+      for(var i = 0; i < PATTERNS.length; i++) if(PATTERNS[i].id === id) return PATTERNS[i];
+      return null;
+    }
+    function colorFor(pat, n){
+      for(var i = 0; i < pat.palette.length; i++) if(pat.palette[i].n === n) return pat.palette[i];
+      return null;
+    }
+    function centroid(pts){
+      var x = 0, y = 0;
+      for(var i = 0; i < pts.length; i++){ x += pts[i][0]; y += pts[i][1]; }
+      return [x / pts.length, y / pts.length];
+    }
+    function bboxSize(pts){
+      var minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9;
+      for(var i = 0; i < pts.length; i++){
+        var p = pts[i];
+        if(p[0] < minX) minX = p[0];
+        if(p[0] > maxX) maxX = p[0];
+        if(p[1] < minY) minY = p[1];
+        if(p[1] > maxY) maxY = p[1];
+      }
+      return [maxX - minX, maxY - minY];
+    }
+    function ptsAttr(pts){
+      return pts.map(function(p){ return p[0] + "," + p[1]; }).join(" ");
+    }
+
+    /* ================= progress (saved on this device) ================= */
+    var SAVE_KEY = "quilt-color-by-number-progress-v1";
+    var progress = { quilts: {} };
+    function blankState(pat){
+      var f = [];
+      for(var i = 0; i < pat.regions.length; i++) f.push(false);
+      return { filled: f, done: false };
+    }
+    function getState(id){
+      var pat = patternById(id);
+      if(!progress.quilts[id]) progress.quilts[id] = blankState(pat);
+      var st = progress.quilts[id];
+      while(st.filled.length < pat.regions.length) st.filled.push(false);
+      if(st.filled.length > pat.regions.length) st.filled.length = pat.regions.length;
+      st.done = st.filled.every(function(x){ return x; });
+      return st;
+    }
+    function countFilled(st){
+      var n = 0;
+      for(var i = 0; i < st.filled.length; i++) if(st.filled[i]) n++;
+      return n;
+    }
+    function saveProgress(){
+      try{ localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); }catch(e){}
+    }
+    function loadProgress(){
+      try{
+        var raw = localStorage.getItem(SAVE_KEY);
+        if(!raw) return;
+        var saved = JSON.parse(raw);
+        if(!saved || !saved.quilts) return;
+        PATTERNS.forEach(function(pat){
+          var s = saved.quilts[pat.id];
+          if(!s || !Array.isArray(s.filled)) return;
+          var st = blankState(pat);
+          for(var i = 0; i < pat.regions.length && i < s.filled.length; i++) st.filled[i] = s.filled[i] === true;
+          st.done = st.filled.every(function(x){ return x; });
+          progress.quilts[pat.id] = st;
+        });
+      }catch(e){}
+    }
+    loadProgress();
+
+    /* ================= confetti ================= */
+    var reducedMotion = false;
+    try{ reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(e){}
+    function confetti(n){
+      if(reducedMotion) return;
+      var box = $("#confetti");
+      var colors = ["#C97B7B","#9CAF88","#E9C46A","#5B7FA6","#7D5A7A","#C67B5C"];
+      n = n || 50;
+      for(var i = 0; i < n; i++){
+        var b = document.createElement("div");
+        b.className = "confetti-bit";
+        var sz = 7 + Math.random() * 9;
+        b.style.left = (Math.random() * 100) + "vw";
+        b.style.width = sz + "px";
+        b.style.height = (sz * 0.62) + "px";
+        b.style.background = colors[i % colors.length];
+        b.style.animationDuration = (1.6 + Math.random() * 1.6) + "s";
+        b.style.animationDelay = (Math.random() * 0.35) + "s";
+        if(Math.random() < 0.4) b.style.borderRadius = "50%";
+        box.appendChild(b);
+        (function(elm){ setTimeout(function(){ elm.remove(); }, 4200); })(b);
+      }
+    }
+
+    /* ================= navigation ================= */
+    function show(id){
+      $$(".screen").forEach(function(s){ s.classList.remove("on"); });
+      $("#" + id).classList.add("on");
+      window.scrollTo(0, 0);
+    }
+    function goHome(){ renderGallery(); show("scr-home"); }
+    $("#homeBtn").addEventListener("click", function(){ goHome(); });
+    $("#backBtn").addEventListener("click", function(){ goHome(); });
+    $("#viewGalleryBtn").addEventListener("click", function(){ goHome(); });
+
+    /* ================= gallery ================= */
+    function thumbSVG(pat){
+      var s = '<svg viewBox="0 0 300 300" aria-hidden="true">';
+      s += '<rect x="0" y="0" width="300" height="300" fill="#FBF3E4"/>';
+      for(var i = 0; i < pat.regions.length; i++){
+        var r = pat.regions[i];
+        var c = colorFor(pat, r.n);
+        s += '<polygon points="' + ptsAttr(r.pts) + '" fill="' + c.hex + '" stroke="#FBF3E4" stroke-width="2" stroke-linejoin="round"/>';
+      }
+      s += '</svg>';
+      return s;
+    }
+    function renderGallery(){
+      var g = $("#gallery");
+      g.innerHTML = "";
+      PATTERNS.forEach(function(pat){
+        var st = getState(pat.id);
+        var filled = countFilled(st);
+        var card = el("button", "quilt-card" + (st.done ? " done" : ""), "");
+        card.type = "button";
+        card.setAttribute("aria-label", pat.name + (st.done ? ", finished" : ", " + filled + " of " + pat.regions.length + " patches filled"));
+        card.innerHTML =
+          '<span class="thumb">' + thumbSVG(pat) + '</span>' +
+          '<span class="qname">' + esc(pat.name) + '</span>' +
+          '<span class="qprog' + (st.done ? " done" : "") + '">' +
+            (st.done ? "&#10003; Finished" : filled + " of " + pat.regions.length + " patches") +
+          '</span>';
+        card.addEventListener("click", function(){ openQuilt(pat.id); });
+        g.appendChild(card);
+      });
+    }
+
+    /* ================= quilt screen ================= */
+    var current = null; /* { pat, mode:"play"|"view", selected:number, zoomIdx:number } */
+    var ZOOMS = [1, 1.4, 1.9, 2.5, 3.2];
+
+    function quiltSVG(pat, st, showNumbers){
+      var s = '<svg class="quilt-svg" viewBox="0 0 300 300" role="img" aria-label="' + esc(pat.name) + ' quilt block">';
+      s += '<rect x="0" y="0" width="300" height="300" fill="#FBF3E4"/>';
+      for(var i = 0; i < pat.regions.length; i++){
+        var r = pat.regions[i];
+        var isFilled = !!st.filled[i];
+        var c = colorFor(pat, r.n);
+        var fill = isFilled ? c.hex : "#FFFDF6";
+        s += '<polygon class="region' + (isFilled ? " filled" : "") + '" data-idx="' + i + '" points="' + ptsAttr(r.pts) + '" fill="' + fill + '" stroke="#8A7B66" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+        if(showNumbers && !isFilled){
+          var cen = centroid(r.pts);
+          var bs = bboxSize(r.pts);
+          var fs = Math.max(13, Math.min(28, Math.floor(Math.min(bs[0], bs[1]) * 0.4)));
+          s += '<text class="region-num" x="' + cen[0].toFixed(1) + '" y="' + (cen[1] + fs * 0.36).toFixed(1) + '" font-size="' + fs + '" text-anchor="middle" fill="#5A4A38">' + r.n + '</text>';
+        }
+      }
+      s += '</svg>';
+      return s;
+    }
+    function countRemaining(pat, n){
+      var st = getState(pat.id);
+      var left = 0;
+      for(var i = 0; i < pat.regions.length; i++){
+        if(pat.regions[i].n === n && !st.filled[i]) left++;
+      }
+      return left;
+    }
+    function renderPalette(){
+      var p = $("#palette");
+      p.innerHTML = "";
+      current.pat.palette.forEach(function(c){
+        var remaining = countRemaining(current.pat, c.n);
+        var b = el("button", "swatch" + (current.selected === c.n ? " sel" : ""), "");
+        b.type = "button";
+        b.setAttribute("aria-label", "Color " + c.n + ", " + c.name + ", " + remaining + " patches left");
+        var light = (c.hex === "#F3E6C8" || c.hex === "#E9C46A");
+        b.innerHTML =
+          '<span class="sw' + (light ? " light" : "") + '" style="background:' + c.hex + '">' + c.n + '</span>' +
+          '<span class="sw-name">' + esc(c.name) + '</span>' +
+          '<span class="sw-left">' + (remaining === 0 ? "done" : remaining + " left") + '</span>';
+        b.addEventListener("click", function(){ current.selected = c.n; renderPalette(); });
+        p.appendChild(b);
+      });
+    }
+    function updateProgress(){
+      var pat = current.pat;
+      var st = getState(pat.id);
+      var filled = countFilled(st);
+      var total = pat.regions.length;
+      $("#progressLine").textContent = filled + " of " + total + " patches filled";
+      $("#progressFill").style.width = Math.round(filled / total * 100) + "%";
+    }
+    function applyZoom(){
+      var z = ZOOMS[current.zoomIdx];
+      $("#quiltZoom").style.width = (300 * z) + "px";
+      $("#zoomLabel").textContent = Math.round(z * 100) + "%";
+    }
+    function renderQuilt(){
+      var pat = current.pat;
+      var st = getState(pat.id);
+      $("#quiltName").textContent = pat.name;
+      $("#quiltZoom").innerHTML = quiltSVG(pat, st, current.mode === "play");
+      updateProgress();
+      applyZoom();
+      var play = current.mode === "play";
+      $("#palette").style.display = play ? "" : "none";
+      $("#tipLine").style.display = play ? "" : "none";
+      $("#hintBtn").style.display = play ? "" : "none";
+      $("#viewBar").classList.toggle("on", !play);
+      if(play) renderPalette();
+    }
+    function openQuilt(id){
+      var pat = patternById(id);
+      if(!pat) return;
+      var st = getState(id);
+      current = { pat: pat, mode: st.done ? "view" : "play", selected: 1, zoomIdx: 0 };
+      if(current.mode === "play"){
+        for(var i = 0; i < pat.regions.length; i++){
+          if(!st.filled[i]){ current.selected = pat.regions[i].n; break; }
+        }
+      }
+      renderQuilt();
+      show("scr-quilt");
+    }
+    function fillRegion(idx){
+      var pat = current.pat;
+      var st = getState(pat.id);
+      if(st.filled[idx]) return;
+      st.filled[idx] = true;
+      st.done = st.filled.every(function(x){ return x; });
+      saveProgress();
+      renderQuilt();
+      if(st.done){
+        setTimeout(function(){ showFinished(pat); }, 550);
+      }
+    }
+    $("#quiltZoom").addEventListener("click", function(ev){
+      if(!current || current.mode !== "play") return;
+      var t = ev.target;
+      if(!t || !t.getAttribute) return;
+      var idxAttr = t.getAttribute("data-idx");
+      if(idxAttr === null) return;
+      var idx = parseInt(idxAttr, 10);
+      var pat = current.pat;
+      var st = getState(pat.id);
+      if(st.filled[idx]) return;
+      var r = pat.regions[idx];
+      if(r.n === current.selected){
+        fillRegion(idx);
+      } else {
+        t.classList.remove("shake");
+        void t.getBoundingClientRect();
+        t.classList.add("shake");
+        setTimeout(function(){ t.classList.remove("shake"); }, 450);
+        current.selected = r.n;
+        renderPalette();
+      }
+    });
+    $("#hintBtn").addEventListener("click", function(){
+      if(!current || current.mode !== "play") return;
+      var pat = current.pat;
+      var st = getState(pat.id);
+      var target = -1;
+      for(var i = 0; i < pat.regions.length; i++){
+        if(!st.filled[i] && pat.regions[i].n === current.selected){ target = i; break; }
+      }
+      if(target < 0){
+        for(var i = 0; i < pat.regions.length; i++){
+          if(!st.filled[i]){ target = i; current.selected = pat.regions[i].n; break; }
+        }
+      }
+      if(target < 0) return;
+      renderPalette();
+      var poly = document.querySelector('.region[data-idx="' + target + '"]');
+      if(poly){
+        poly.classList.add("hint");
+        setTimeout(function(){ poly.classList.remove("hint"); }, 2600);
+      }
+    });
+    $("#zoomIn").addEventListener("click", function(){
+      if(!current) return;
+      if(current.zoomIdx < ZOOMS.length - 1) current.zoomIdx++;
+      applyZoom();
+    });
+    $("#zoomOut").addEventListener("click", function(){
+      if(!current) return;
+      if(current.zoomIdx > 0) current.zoomIdx--;
+      applyZoom();
+    });
+    $("#zoomFit").addEventListener("click", function(){
+      if(!current) return;
+      current.zoomIdx = 0;
+      applyZoom();
+      $("#quiltWrap").scrollTop = 0;
+      $("#quiltWrap").scrollLeft = 0;
+    });
+
+    /* ================= completion ================= */
+    function nextUnfinished(afterId){
+      var start = 0;
+      for(var i = 0; i < PATTERNS.length; i++) if(PATTERNS[i].id === afterId){ start = i + 1; break; }
+      for(var k = 0; k < PATTERNS.length; k++){
+        var pat = PATTERNS[(start + k) % PATTERNS.length];
+        if(!getState(pat.id).done) return pat;
+      }
+      return null;
+    }
+    function showFinished(pat){
+      $("#doneTitle").textContent = "Quilt finished!";
+      $("#doneText").textContent = pat.name + " is all filled in. Beautiful work!";
+      var next = nextUnfinished(pat.id);
+      var nb = $("#nextBtn");
+      if(next){ nb.textContent = "Next quilt: " + next.name; nb.style.display = ""; }
+      else { nb.textContent = "See your quilts"; nb.style.display = ""; }
+      $("#overlay").classList.add("on");
+      confetti(60);
+    }
+    function closeOverlay(){ $("#overlay").classList.remove("on"); }
+    $("#nextBtn").addEventListener("click", function(){
+      closeOverlay();
+      var next = current ? nextUnfinished(current.pat.id) : null;
+      if(next) openQuilt(next.id);
+      else goHome();
+    });
+    $("#doneGalleryBtn").addEventListener("click", function(){ closeOverlay(); goHome(); });
+
+    /* ================= re-color (reset one quilt) ================= */
+    var recolorArmed = false, recolorTimer = null;
+    $("#recolorBtn").addEventListener("click", function(){
+      if(!current) return;
+      var btn = this;
+      if(!recolorArmed){
+        recolorArmed = true;
+        btn.textContent = "Tap again to start this quilt over";
+        recolorTimer = setTimeout(function(){
+          recolorArmed = false;
+          btn.textContent = "Re-color this quilt";
+        }, 4000);
+        return;
+      }
+      clearTimeout(recolorTimer);
+      recolorArmed = false;
+      btn.textContent = "Re-color this quilt";
+      var pat = current.pat;
+      progress.quilts[pat.id] = blankState(pat);
+      saveProgress();
+      current.mode = "play";
+      current.selected = pat.regions[0].n;
+      current.zoomIdx = 0;
+      renderQuilt();
+    });
+
+    /* ================= clear all saved progress (two-tap) ================= */
+    var resetArmed = false, resetTimer = null;
+    $("#resetBtn").addEventListener("click", function(){
+      var btn = this;
+      if(!resetArmed){
+        resetArmed = true;
+        btn.textContent = "Tap again to erase all quilts";
+        resetTimer = setTimeout(function(){
+          resetArmed = false;
+          btn.textContent = "Clear saved progress";
+        }, 4000);
+        return;
+      }
+      clearTimeout(resetTimer);
+      resetArmed = false;
+      try{ localStorage.removeItem(SAVE_KEY); }catch(e){}
+      progress = { quilts: {} };
+      renderGallery();
+      btn.textContent = "All progress cleared";
+      setTimeout(function(){ btn.textContent = "Clear saved progress"; }, 3000);
+    });
+
+    /* ================= self-test (only with ?selftest=1) ================= */
+    function selfTest(){
+      var out = [];
+      function check(cond, msg){ out.push((cond ? "PASS " : "FAIL ") + msg); }
+      check(PATTERNS.length >= 8, "at least 8 patterns (" + PATTERNS.length + ")");
+      var ids = {};
+      PATTERNS.forEach(function(pat){
+        check(!ids[pat.id], "unique id " + pat.id);
+        ids[pat.id] = 1;
+        check(pat.palette.length >= 2 && pat.palette.length <= 6, pat.id + " palette size " + pat.palette.length);
+        var nums = {};
+        pat.palette.forEach(function(c){
+          check(!nums[c.n], "unique palette number " + c.n + " in " + pat.id);
+          nums[c.n] = 1;
+          check(/^#[0-9A-Fa-f]{6}$/.test(c.hex), "hex " + c.hex + " in " + pat.id);
+          check(typeof c.name === "string" && c.name.length > 0, "palette name for " + c.n + " in " + pat.id);
+        });
+        check(pat.regions.length > 0, pat.id + " has regions");
+        pat.regions.forEach(function(r, i){
+          check(typeof r.n === "number" && r.n >= 1 && r.n <= 6, pat.id + " region " + i + " number " + r.n);
+          check(!!nums[r.n], pat.id + " region " + i + " number " + r.n + " covered by palette");
+          check(Array.isArray(r.pts) && r.pts.length >= 3, pat.id + " region " + i + " has >=3 points");
+          r.pts.forEach(function(p){
+            check(typeof p[0] === "number" && typeof p[1] === "number" && p[0] >= -0.01 && p[0] <= 300.01 && p[1] >= -0.01 && p[1] <= 300.01, pat.id + " region " + i + " point in bounds");
+          });
+        });
+      });
+      try{
+        localStorage.setItem(SAVE_KEY, JSON.stringify({ quilts: {} }));
+        var raw = localStorage.getItem(SAVE_KEY);
+        check(raw !== null, "localStorage round-trip");
+        localStorage.removeItem(SAVE_KEY);
+      }catch(e){ check(false, "localStorage round-trip threw " + e); }
+      var pat0 = PATTERNS[0];
+      var st = blankState(pat0);
+      for(var i = 0; i < pat0.regions.length; i++) st.filled[i] = true;
+      check(st.filled.every(function(x){ return x; }), "all-filled detection for " + pat0.id);
+      // end-to-end: fill two regions through the real game path, then clear
+      try{
+        current = { pat: pat0, mode: "play", selected: pat0.regions[0].n, zoomIdx: 0 };
+        renderQuilt();
+        var before = countFilled(getState(pat0.id));
+        fillRegion(0);
+        fillRegion(1);
+        var after = countFilled(getState(pat0.id));
+        check(after === before + 2, "fillRegion fills through game path (" + before + " -> " + after + ")");
+        var savedRaw = localStorage.getItem(SAVE_KEY);
+        check(savedRaw !== null && savedRaw.indexOf(pat0.id) !== -1, "fill saves to localStorage");
+        var poly0 = document.querySelector('.region[data-idx="0"]');
+        check(!!poly0, "filled region polygon present in DOM");
+        // clear-all flow (same operations as the two-tap reset button)
+        localStorage.removeItem(SAVE_KEY);
+        progress = { quilts: {} };
+        renderGallery();
+        check(localStorage.getItem(SAVE_KEY) === null, "clear removes saved progress");
+        check(countFilled(getState(pat0.id)) === 0, "clear resets filled count to 0");
+        var cardText = document.querySelector(".quilt-card .qprog");
+        check(!!cardText && cardText.textContent.indexOf("0 of") === 0, "gallery re-renders 0 filled after clear");
+        current = null;
+        show("scr-home");
+      }catch(e){ check(false, "end-to-end fill/clear threw " + e); }
+      var fails = out.filter(function(l){ return l.indexOf("FAIL") === 0; });
+      var res = "SELFTEST " + (fails.length === 0 ? "PASS" : "FAIL") + " (" + out.length + " checks, " + fails.length + " failures)";
+      document.title = res;
+      var d = document.getElementById("selftest");
+      if(d){ d.style.display = "block"; d.textContent = res + "\n" + out.join("\n"); }
+    }
+
+    /* ================= init ================= */
+    renderGallery();
+    if(/[?&]selftest=1/.test(location.search)) selfTest();
+    </script>
+  </body>
+</html>
